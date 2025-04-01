@@ -44,7 +44,7 @@ RUN apt-get update \
     libmunge-dev \
     && rm -rf /tmp/* $HOME/.cache /var/lib/apt/lists/*
 
-ARG SLURM_TAG=slurm-23-02-7-1
+ARG SLURM_TAG
 
 RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
     && cd slurm \
@@ -78,9 +78,11 @@ RUN mkdir -p /etc/sysconfig/slurm \
         /var/lib/slurmd/qos_usage \
         /var/lib/slurmd/fed_mgr_state 
 
+ARG PUBLIC_KEY
+
 # setup login to ssh 
 RUN mkdir -p /root/.ssh/ \
-    && echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930' >> /root/.ssh/authorized_keys \
+    && echo "$PUBLIC_KEY" >> /root/.ssh/authorized_keys \
     && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config \
     && echo 'Port=2222' >> /etc/ssh/sshd_config \
     && echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
