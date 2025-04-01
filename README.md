@@ -32,7 +32,7 @@ Update the `SLURM_TAG` and `IMAGE_TAG` found in the `.env` file and build
 the image:
 
 ```bash
-docker build . -t mmarciani/slurm-cluster-openssh-docker
+docker build . -t mmarciani/slurm-openssh-container
 ```
 
 Alternatively, you can build the Slurm Docker image locally by specifying the
@@ -40,7 +40,7 @@ Alternatively, you can build the Slurm Docker image locally by specifying the
 tagging the container with a version ***(IMAGE_TAG)***:
 
 ```bash
-docker build . -t mmarciani/slurm-cluster-openssh-docker:IMAGE_TAG
+docker build . -t mmarciani/slurm-openssh-container:IMAGE_TAG
 ```
 
 You might want to specify your own public key also in the `Dockerfile` to access the 
@@ -52,7 +52,7 @@ Once the image is built, deploy the cluster with the default version of slurm
 using Docker run:
 
 ```bash
-docker run -h slurmctld -p 2222:2222 mmarciani/slurm-cluster-openssh-docker
+docker run -h slurmctld -p 2222:2222 mmarciani/slurm-openssh-container
 ```
 
 The `-h` flag is mandatory so that the slurm deamons accept to start.
