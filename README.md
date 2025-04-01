@@ -28,23 +28,24 @@ This setup consists of the executables, launched orderly
 
 ## Building the Docker Image
 
-Update the `SLURM_TAG` and `IMAGE_TAG` found in the `.env` file and build
-the image:
+Check [Slurm's tags](https://github.com/SchedMD/slurm/tags) and add it as a build
+parameter with the `SLURM_TAG` argument.
+
+Generate a public-private pair key to configure the passwordless connection to the 
+container.
+
+```bash
+ssh-keygen -t ed25519 -f container_root_pubkey
+cat container_root_pubkey.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930
+```
+
+Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
 docker build . -t mmarciani/slurm-openssh-container
+docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930' -t mmarciani/slurm-openssh:23-02-7-1 .
 ```
-
-Alternatively, you can build the Slurm Docker image locally by specifying the
-[SLURM_TAG](https://github.com/SchedMD/slurm/tags) in the Dockerfile and
-tagging the container with a version ***(IMAGE_TAG)***:
-
-```bash
-docker build . -t mmarciani/slurm-openssh-container:IMAGE_TAG
-```
-
-You might want to specify your own public key also in the `Dockerfile` to access the 
-container via passwordless connection.
 
 ## Starting the Cluster
 
@@ -60,19 +61,15 @@ The `-h` flag is mandatory so that the slurm deamons accept to start.
 Check that it is running and that it is listening to the correct port
 
 ```bash
-docker container ls
+mgimenez@bsces107930 ~ % docker container ls
+CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+25304831deb5   mmarciani/slurm-openssh   "/tini -- /usr/local…"   5 seconds ago   Up 3 seconds   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   upbeat_carson
 ```
 
 ## Accessing the Cluster via SSH
 
-To interact with the Slurm controller, connect to localhost in 2222 under
-the user root.
-
-```bash
-ssh root@localhost -p 2222 -i ~/.ssh/root_slurm_openssh_container sinfo
-```
-
-Now you can run any Slurm command from inside the container:
+To interact with the Slurm controller, connect to localhost in 2222 with the user 
+root.
 
 ```bash
 mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/root_slurm_openssh_container sinfo               
