@@ -12,7 +12,7 @@ To get up and running with Slurm in Docker, make sure you have the following too
 Clone the repository:
 
 ```bash
-git clone https://github.com/manuel-g-castro/slurm-cluster-openssh-docker.git 
+git clone https://github.com/manuel-g-castro/slurm-openssh-container.git 
 cd slurm-docker-openssh-docker
 ```
 
