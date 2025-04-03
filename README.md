@@ -35,7 +35,7 @@ Generate a public-private pair key to configure the passwordless connection to t
 container.
 
 ```bash
-ssh-keygen -t ed25519 -f container_root_pubkey
+ssh-keygen -t ed25519 -f ~/.ssh/container_root_pubkey
 cat container_root_pubkey.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930
 ```
@@ -44,7 +44,7 @@ Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
 docker build . -t ${USER}/slurm-openssh:23-02-7-1
-docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930' -t ${USER}/slurm-openssh:23-02-7-1 .
+docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY="$(cat ~/.ssh/container_root_pubkey.pub)" -t ${USER}/slurm-openssh:23-02-7-1 .
 ```
 
 ## Starting the Cluster
