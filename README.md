@@ -72,7 +72,7 @@ To interact with the Slurm controller, connect to localhost in 2222 with the use
 root.
 
 ```bash
-mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/root_slurm_openssh_container sinfo               
+mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/container_root_pubkey sinfo               
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 normal*      up 5-00:00:00      1   idle slurmctld
 ```
