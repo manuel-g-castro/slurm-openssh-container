@@ -43,7 +43,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP
 Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
-docker build . -t ${USER}/slurm-openssh-container
+docker build . -t ${USER}/slurm-openssh:23-02-7-1
 docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930' -t ${USER}/slurm-openssh:23-02-7-1 .
 ```
 
