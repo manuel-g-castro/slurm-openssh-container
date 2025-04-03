@@ -35,7 +35,7 @@ Generate a public-private pair key to configure the passwordless connection to t
 container.
 
 ```bash
-ssh-keygen -t ed25519 -f container_root_pubkey
+ssh-keygen -t ed25519 -f ~/.ssh/container_root_pubkey
 cat container_root_pubkey.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930
 ```
@@ -43,8 +43,9 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP
 Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
-docker build . -t mmarciani/slurm-openssh-container
-docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930' -t mmarciani/slurm-openssh:23-02-7-1 .
+export SLURM_VERSION=23-02-7-1
+docker build . -t autosubmit/slurm-openssh:${SLURM_VERSION}
+docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} --build-arg PUBLIC_KEY="$(cat ~/.ssh/container_root_pubkey.pub)" -t autosubmit/slurm-openssh:${SLURM_VERSION} .
 ```
 
 ## Starting the Cluster
@@ -53,7 +54,7 @@ Once the image is built, deploy the cluster with the default version of slurm
 using Docker run:
 
 ```bash
-docker run -h slurmctld -p 2222:2222 mmarciani/slurm-openssh-container
+docker run -h slurmctld -p 2222:2222 autosubmit/slurm-openssh:${SLURM_VERSION}
 ```
 
 The `-h` flag is mandatory so that the slurm deamons accept to start.
@@ -62,8 +63,8 @@ Check that it is running and that it is listening to the correct port
 
 ```bash
 mgimenez@bsces107930 ~ % docker container ls
-CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
-25304831deb5   mmarciani/slurm-openssh   "/tini -- /usr/local…"   5 seconds ago   Up 3 seconds   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   upbeat_carson
+CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
 ```
 
 ## Accessing the Cluster via SSH
@@ -72,7 +73,7 @@ To interact with the Slurm controller, connect to localhost in 2222 with the use
 root.
 
 ```bash
-mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/root_slurm_openssh_container sinfo               
+mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/container_root_pubkey sinfo               
 PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 normal*      up 5-00:00:00      1   idle slurmctld
 ```
@@ -82,7 +83,7 @@ normal*      up 5-00:00:00      1   idle slurmctld
 Submit jobs through ssh by running the following command:
 
 ```bash
-mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/root_slurm_openssh_container sbatch --wrap=\"sleep 20\"
+mgimenez@bsces107930 ~ % ssh root@localhost -p 2222 -i ~/.ssh/container_root_pubkey sbatch --wrap=\"sleep 20\"
 Submitted batch job 1
 ```
 
