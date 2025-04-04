@@ -43,8 +43,9 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP
 Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
-docker build . -t ${USER}/slurm-openssh:23-02-7-1
-docker build --build-arg SLURM_TAG='slurm-23-02-7-1' --build-arg PUBLIC_KEY="$(cat ~/.ssh/container_root_pubkey.pub)" -t ${USER}/slurm-openssh:23-02-7-1 .
+export SLURM_VERSION=23-02-7-1
+docker build . -t autosubmit/slurm-openssh:${SLURM_VERSION}
+docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} --build-arg PUBLIC_KEY="$(cat ~/.ssh/container_root_pubkey.pub)" -t autosubmit/slurm-openssh:${SLURM_VERSION} .
 ```
 
 ## Starting the Cluster
@@ -53,7 +54,7 @@ Once the image is built, deploy the cluster with the default version of slurm
 using Docker run:
 
 ```bash
-docker run -h slurmctld -p 2222:2222 ${USER}/slurm-openssh:23-02-7-1
+docker run -h slurmctld -p 2222:2222 autosubmit/slurm-openssh:${SLURM_VERSION}
 ```
 
 The `-h` flag is mandatory so that the slurm deamons accept to start.
@@ -63,7 +64,7 @@ Check that it is running and that it is listening to the correct port
 ```bash
 mgimenez@bsces107930 ~ % docker container ls
 CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-ece3a5b0b6fe   ${USER}/slurm-openssh:23-02-7-1    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
+ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
 ```
 
 ## Accessing the Cluster via SSH
