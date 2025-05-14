@@ -78,11 +78,12 @@ RUN mkdir -p /etc/sysconfig/slurm \
         /var/lib/slurmd/qos_usage \
         /var/lib/slurmd/fed_mgr_state 
 
-ARG PUBLIC_KEY
+RUN ssh-keygen -q -t rsa -N '' -f /root/.ssh/container_root_pubkey
 
-# setup login to ssh 
+# setup login to ssh
 RUN mkdir -p /root/.ssh/ \
-    && echo "$PUBLIC_KEY" >> /root/.ssh/authorized_keys \
+    && cat /root/.ssh/container_root_pubkey.pub >> /root/.ssh/authorized_keys \
+    && chmod -R 700 /root/.ssh/ \
     && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config \
     && echo 'Port=2222' >> /etc/ssh/sshd_config \
     && echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
