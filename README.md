@@ -66,6 +66,7 @@ Check that it is running and that it is listening to the correct port
 mgimenez@bsces107930 ~ % docker container ls
 CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS                                       NAMES
 ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
+
 ```
 
 ## Copying ssh key from container to local
@@ -77,7 +78,6 @@ mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:container_root_pubkey ~/.ssh
 Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
 mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:container_root_pubkey.pub ~/.ssh/container_root_pubkey.pub
 Successfully copied 2.56kB to ~/.ssh/container_root_pubkey.pub
-
 ```
 
 ## Accessing the Cluster via SSH
