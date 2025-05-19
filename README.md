@@ -75,7 +75,6 @@ In order to gain access to the container and get the sshkey you need to copy the
 ```bash
 mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
 Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
-
 ```
 
 ## Accessing the Cluster via SSH
