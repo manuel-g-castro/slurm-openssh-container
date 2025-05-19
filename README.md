@@ -31,19 +31,6 @@ This setup consists of the executables, launched orderly
 Check [Slurm's tags](https://github.com/SchedMD/slurm/tags) and add it as a build
 parameter with the `SLURM_TAG` argument.
 
-Generate a public-private pair key to configure the passwordless connection to the 
-container.
-
-<span style="color: rgba(255, 255, 255, 0.5);">Optional step if you want to use your own instead of the one generated ssh-key</span>
-
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/container_root_pubkey
-cat container_root_pubkey.pub
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930
-```
-
-Build the image withe `PUBLIC_KEY` argument as the generated public key.
-
 ```bash
 export SLURM_VERSION=23-02-7-1
 docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} -t autosubmit/slurm-openssh-container:${SLURM_VERSION} .
@@ -70,11 +57,12 @@ ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local
 
 ## Copying ssh key from container to local
 
-In order to gain access to the container and get the sshkey you need to copy the randomly generated key to your local
+Run the following command to retrieve the build-time generated ssh key to access the container through ssh.
 
 ```bash
 mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
 Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
+
 ```
 
 ## Accessing the Cluster via SSH
