@@ -31,6 +31,7 @@ This setup consists of the executables, launched orderly
 Check [Slurm's tags](https://github.com/SchedMD/slurm/tags) and add it as a build
 parameter with the `SLURM_TAG` argument.
 
+
 ```bash
 export SLURM_VERSION=23-02-7-1
 docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} -t autosubmit/slurm-openssh-container:${SLURM_VERSION} .
@@ -62,7 +63,6 @@ Run the following command to retrieve the build-time generated ssh key to access
 ```bash
 mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
 Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
-
 ```
 
 ## Accessing the Cluster via SSH
@@ -123,4 +123,3 @@ root@slurmctld:/#
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
