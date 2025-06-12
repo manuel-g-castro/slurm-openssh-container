@@ -31,21 +31,10 @@ This setup consists of the executables, launched orderly
 Check [Slurm's tags](https://github.com/SchedMD/slurm/tags) and add it as a build
 parameter with the `SLURM_TAG` argument.
 
-Generate a public-private pair key to configure the passwordless connection to the 
-container.
-
-```bash
-ssh-keygen -t ed25519 -f ~/.ssh/container_root_pubkey
-cat container_root_pubkey.pub
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH8a5WpSERO2+dXt1mISa8oS2Yc7VkSzhy2OuFwqnohP mgimenez@bsces107930
-```
-
-Build the image withe `PUBLIC_KEY` argument as the generated public key.
 
 ```bash
 export SLURM_VERSION=23-02-7-1
-docker build . -t autosubmit/slurm-openssh:${SLURM_VERSION}
-docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} --build-arg PUBLIC_KEY="$(cat ~/.ssh/container_root_pubkey.pub)" -t autosubmit/slurm-openssh:${SLURM_VERSION} .
+docker build --build-arg SLURM_TAG='slurm-'${SLURM_VERSION} -t autosubmit/slurm-openssh-container:${SLURM_VERSION} .
 ```
 
 ## Starting the Cluster
@@ -54,7 +43,7 @@ Once the image is built, deploy the cluster with the default version of slurm
 using Docker run:
 
 ```bash
-docker run -h slurmctld -p 2222:2222 autosubmit/slurm-openssh:${SLURM_VERSION}
+docker run -h slurmctld -p 2222:2222 autosubmit/slurm-openssh-container:${SLURM_VERSION}
 ```
 
 The `-h` flag is mandatory so that the slurm deamons accept to start.
@@ -65,6 +54,15 @@ Check that it is running and that it is listening to the correct port
 mgimenez@bsces107930 ~ % docker container ls
 CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS                                       NAMES
 ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
+```
+
+## Copying ssh key from container to local
+
+Run the following command to retrieve the build-time generated ssh key to access the container through ssh.
+
+```bash
+mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
+Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
 ```
 
 ## Accessing the Cluster via SSH
@@ -113,7 +111,15 @@ JobID           JobName  Partition    Account  AllocCPUS      State ExitCode
 1.batch           batch                  root          1  COMPLETED      0:0
 ```
 
+## Accessing the Cluster via docker exec
+
+In order to gain access to the container's terminal you can use docker exec
+
+```bash
+mgimenez@bsces107930 ~ % docker exec -it <CONTAINER ID> /bin/bash
+root@slurmctld:/#
+```
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
