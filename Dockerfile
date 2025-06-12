@@ -13,8 +13,6 @@ LABEL org.opencontainers.image.source="https://github.com/manuel-g-castro/slurm-
 
 RUN apt-get update \
     && apt-get --no-install-recommends -y install make \
-    systemd \
-    curl \
     build-essential \
     automake \ 
     autoconf \
@@ -46,14 +44,7 @@ RUN apt-get update \
     libmunge2 \
     libmunge-dev \
     libssl-dev \
-    libdbus-1-dev \
-    slurm-wlm \
-    slurm-client \
-    slurmd \
-    && rm -rf /tmp/* $HOME/.cache /var/lib/apt/lists/*
-
-# Enable systemd in the container
-VOLUME ["/sys/fs/cgroup"]
+    libdbus-1-dev
 
 ARG SLURM_TAG
 
@@ -123,7 +114,6 @@ RUN chmod +x /tini
 
 # Copy Slurm configuration files into the container
 COPY slurm.conf /etc/slurm/slurm.conf
-COPY cgroup.conf /etc/slurm/cgroup.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
@@ -131,9 +121,5 @@ RUN chmod 600 /etc/slurm/slurm.conf /etc/slurm/slurmdbd.conf
 
 EXPOSE 2222
 
-CMD ["/tini", "--", "/usr/local/bin/docker-entrypoint.sh", "/lib/systemd/systemd"]
-
-# Enable Slurm services
-RUN systemctl enable munge && \
-    systemctl enable slurmd
+CMD ["/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
 
