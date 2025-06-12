@@ -13,6 +13,9 @@ LABEL org.opencontainers.image.source="https://github.com/manuel-g-castro/slurm-
 
 RUN apt-get update \
     && apt-get --no-install-recommends -y install make \
+    systemd \
+    curl \
+    build-essential \
     automake \ 
     autoconf \
     gcc \
@@ -42,7 +45,15 @@ RUN apt-get update \
     munge \
     libmunge2 \
     libmunge-dev \
+    libssl-dev \
+    libdbus-1-dev \
+    slurm-wlm \
+    slurm-client \
+    slurmd \
     && rm -rf /tmp/* $HOME/.cache /var/lib/apt/lists/*
+
+# Enable systemd in the container
+VOLUME ["/sys/fs/cgroup"]
 
 ARG SLURM_TAG
 
@@ -59,7 +70,7 @@ RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/Sched
     && rm -rf slurm 
 
 # manuel: set the username for the run script
-ENV USERNAME root
+ENV USERNAME=root
 
 RUN mkdir -p /etc/sysconfig/slurm \
         /var/spool/slurmd \
@@ -100,17 +111,19 @@ RUN mkdir -p /tmp/scratch/group/root
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
     && locale-gen
 
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8    
+ENV LANG=en_US.UTF-8  
+ENV LANGUAGE=en_US:en  
+ENV LC_ALL=en_US.UTF-8    
 
 # Add Tini. (manuel: a lightweight init, systemd, etc)
 
-ENV TINI_VERSION v0.18.0
+ENV TINI_VERSION=v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
+# Copy Slurm configuration files into the container
 COPY slurm.conf /etc/slurm/slurm.conf
+COPY cgroup.conf /etc/slurm/cgroup.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
@@ -118,5 +131,9 @@ RUN chmod 600 /etc/slurm/slurm.conf /etc/slurm/slurmdbd.conf
 
 EXPOSE 2222
 
-CMD ["/tini", "--", "/usr/local/bin/docker-entrypoint.sh"]
+CMD ["/tini", "--", "/usr/local/bin/docker-entrypoint.sh", "/lib/systemd/systemd"]
+
+# Enable Slurm services
+RUN systemctl enable munge && \
+    systemctl enable slurmd
 
