@@ -43,7 +43,7 @@ Once the image is built, deploy the cluster with the default version of slurm
 using Docker run:
 
 ```bash
-docker run -h slurmctld -p 2222:2222 autosubmit/slurm-openssh-container:${SLURM_VERSION}
+docker run -h slurmctld -p 2222:2222 --name slurm-container autosubmit/slurm-openssh-container:${SLURM_VERSION}
 ```
 
 The `-h` flag is mandatory so that the slurm deamons accept to start.
@@ -53,7 +53,7 @@ Check that it is running and that it is listening to the correct port
 ```bash
 mgimenez@bsces107930 ~ % docker container ls
 CONTAINER ID   IMAGE                               COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   zen_booth
+ece3a5b0b6fe   autosubmit/slurm-openssh-container:${SLURM_VERSION}    "/tini -- /usr/local…"   21 minutes ago   Up 21 minutes   0.0.0.0:2222->2222/tcp, :::2222->2222/tcp   slurm-container
 ```
 
 ## Copying ssh key from container to local
@@ -61,7 +61,7 @@ ece3a5b0b6fe   autosubmit/slurm-openssh:${SLURM_VERSION}    "/tini -- /usr/local
 Run the following command to retrieve the build-time generated ssh key to access the container through ssh.
 
 ```bash
-mgimenez@bsces107930 ~ % docker cp <CONTAINER NAME>:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
+mgimenez@bsces107930 ~ % docker cp slurm-container:/root/.ssh/container_root_pubkey ~/.ssh/container_root_pubkey
 Successfully copied 4.61kB to ~/.ssh/container_root_pubkey
 ```
 
@@ -116,7 +116,7 @@ JobID           JobName  Partition    Account  AllocCPUS      State ExitCode
 In order to gain access to the container's terminal you can use docker exec
 
 ```bash
-mgimenez@bsces107930 ~ % docker exec -it <CONTAINER ID> /bin/bash
+mgimenez@bsces107930 ~ % docker exec -it slurm-container /bin/bash
 root@slurmctld:/#
 ```
 

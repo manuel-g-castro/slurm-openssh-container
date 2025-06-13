@@ -13,7 +13,8 @@ LABEL org.opencontainers.image.source="https://github.com/manuel-g-castro/slurm-
 
 RUN apt-get update \
     && apt-get --no-install-recommends -y install make \
-    automake \ 
+    build-essential \
+    automake \
     autoconf \
     gcc \
     g++ \
@@ -42,7 +43,8 @@ RUN apt-get update \
     munge \
     libmunge2 \
     libmunge-dev \
-    && rm -rf /tmp/* $HOME/.cache /var/lib/apt/lists/*
+    libssl-dev \
+    libdbus-1-dev
 
 ARG SLURM_TAG
 
@@ -56,10 +58,10 @@ RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/Sched
     && install -D -m644 etc/slurmdbd.conf.example /etc/slurm/slurmdbd.conf.example \
     && install -D -m644 contribs/slurm_completion_help/slurm_completion.sh /etc/profile.d/slurm_completion.sh \
     && cd .. \
-    && rm -rf slurm 
+    && rm -rf slurm
 
 # manuel: set the username for the run script
-ENV USERNAME root
+ENV USERNAME=root
 
 RUN mkdir -p /etc/sysconfig/slurm \
         /var/spool/slurmd \
@@ -76,7 +78,7 @@ RUN mkdir -p /etc/sysconfig/slurm \
         /var/lib/slurmd/assoc_mgr_state \
         /var/lib/slurmd/assoc_usage \
         /var/lib/slurmd/qos_usage \
-        /var/lib/slurmd/fed_mgr_state 
+        /var/lib/slurmd/fed_mgr_state
 
 RUN ssh-keygen -q -t rsa -N '' -f /root/.ssh/container_root_pubkey
 
@@ -92,21 +94,25 @@ RUN mkdir -p /root/.ssh/ \
 RUN mkdir /var/run/sshd \
     && chmod 0755 /var/run/sshd
 
+# Create folder to simulate the projects used in Marenostrum and for the tests
+RUN mkdir -p /tmp/scratch/group/root
+
 # Set the locale. Taken from http://jaredmarkell.com/docker-and-locales/
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
     && locale-gen
 
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8    
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 # Add Tini. (manuel: a lightweight init, systemd, etc)
 
-ENV TINI_VERSION v0.18.0
+ENV TINI_VERSION=v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
+# Copy Slurm configuration files into the container
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh

@@ -4,6 +4,8 @@
 # Copyright (C) 2025  Manuel G. Marciani
 # BSC-CNS - Earth Sciences
 
+dbus-daemon --config-file=/usr/share/dbus-1/session.conf --print-address --fork
+sleep 1
 /usr/bin/mysqld_safe &
 # TODO uncrappyfy this 
 sleep 1
