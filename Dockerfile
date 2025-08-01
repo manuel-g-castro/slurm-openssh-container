@@ -3,7 +3,7 @@
 # Copyright (c) 2025  Manuel G. Marciani
 # BSC-CNS - Earth Sciences
 
-FROM debian:stable-slim
+FROM debian:trixie-20250721-slim
 
 LABEL org.opencontainers.image.source="https://github.com/manuel-g-castro/slurm-cluster-openssh-docker/" \
       org.opencontainers.image.title="slurm-cluster-openssh-docker" \
@@ -91,7 +91,7 @@ RUN mkdir -p /root/.ssh/ \
     && echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
 
 # ssh setup https://askubuntu.com/questions/1110828/ssh-failed-to-start-missing-privilege-separation-directory-var-run-sshd
-RUN mkdir /var/run/sshd \
+RUN mkdir -p /var/run/sshd \
     && chmod 0755 /var/run/sshd
 
 # Create folder to simulate the projects used in Marenostrum and for the tests
