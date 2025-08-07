@@ -118,9 +118,6 @@ COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# tell srun to use pmix implementation for mpi
-ENV SLURM_MPI_TYPE=pmix
-
 RUN chmod 600 /etc/slurm/slurm.conf /etc/slurm/slurmdbd.conf
 
 EXPOSE 2222
