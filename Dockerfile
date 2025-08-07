@@ -10,6 +10,8 @@ LABEL org.opencontainers.image.source="https://github.com/manuel-g-castro/slurm-
       org.opencontainers.image.description="Slurm Docker cluster on Debian Slim with an OpenSSH server" 
 
 # install openssh server 
+# install dependencies 
+# install openmpi and its headers to run srun with it
 
 RUN apt-get update \
     && apt-get --no-install-recommends -y install make \
@@ -40,11 +42,10 @@ RUN apt-get update \
     locales \
     openssh-server \
     dirmngr \
-    munge \
-    libmunge2 \
-    libmunge-dev \
     libssl-dev \
-    libdbus-1-dev
+    libdbus-1-dev \
+    openmpi-bin \
+    libopenmpi-dev
 
 ARG SLURM_TAG
 
@@ -112,10 +113,13 @@ ENV TINI_VERSION=v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
-# Copy Slurm configuration files into the container
+# Copy Slurm configuration files into the container and configure environment variables
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# tell srun to use pmix implementation for mpi
+ENV SLURM_MPI_TYPE=pmix
 
 RUN chmod 600 /etc/slurm/slurm.conf /etc/slurm/slurmdbd.conf
 
