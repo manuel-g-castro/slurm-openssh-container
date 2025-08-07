@@ -11,7 +11,7 @@ sleep 1
 sleep 1
 /usr/sbin/sshd & 
 /usr/sbin/slurmdbd & 
-sleep 1
+sleep 2
 /usr/sbin/slurmd -N slurmctld & 
 /usr/sbin/slurmctld -D
 
