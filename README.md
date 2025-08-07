@@ -120,6 +120,24 @@ mgimenez@bsces107930 ~ % docker exec -it slurm-container /bin/bash
 root@slurmctld:/#
 ```
 
+## MPI inside of the container
+
+This image installs OpenMPI in order to execute MPI applications inside of the container.
+
+## Known issues
+
+`slurmd`, the program that runs on every node and communicates to the main controller, `slurmctld`, does not properly identify the total amount of resources within the Docker. 
+
+In order to fix this issue, you have to manually specify the total number of cores that you want to allow the `slurmd` deamon to use in the `slurm.conf`:
+
+
+```
+NodeName=slurmctld CPUs=<change with how many cores you have> RealMemory=<change with how much memory your sytem has> State=UNKNOWN
+```
+
+We have set there some default values Intel i5-1135G7 running with 16GB of memory.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
