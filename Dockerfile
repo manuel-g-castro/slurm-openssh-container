@@ -116,6 +116,7 @@ RUN chmod +x /tini
 # Copy Slurm configuration files into the container and configure environment variables
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
+COPY cgroup.conf /etc/slurm/cgroup.conf
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 # tell srun to use pmix implementation for mpi
